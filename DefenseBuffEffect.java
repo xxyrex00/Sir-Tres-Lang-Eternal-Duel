@@ -10,7 +10,7 @@ public class DefenseBuffEffect extends StatusEffect {
     public void applyEndOfTurn(Character c) { }
 
     @Override
-    public void onApply(Character c) {
+    public void onApply(Character c) {  //Increases defense by a fixed amount for a duration
         c.defense += magnitude;
         System.out.println(c.name + "'s defense increased by " + magnitude + ".");
     }

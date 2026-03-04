@@ -10,13 +10,13 @@ public class DefenseDebuffEffect extends StatusEffect {
     public void applyEndOfTurn(Character c) { }
 
     @Override
-    public void onApply(Character c) {
+    public void onApply(Character c) {  //Apply defense reduction
         c.defense -= magnitude;
         System.out.println(c.name + "'s defense decreased by " + magnitude + ".");
     }
 
     @Override
-    public void onRemove(Character c) {
+    public void onRemove(Character c) { //Restore defense when effect ends
         c.defense += magnitude;
         System.out.println(c.name + "'s defense debuff wore off.");
     }
