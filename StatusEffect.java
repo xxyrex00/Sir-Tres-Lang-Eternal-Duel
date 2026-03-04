@@ -1,7 +1,7 @@
 public abstract class StatusEffect {
     protected String name;
-    protected int duration; // turns remaining; -1 means permanent (until encounter ends)
-    protected int magnitude; // damage amount or stat change
+    protected int duration; 
+    protected int magnitude; 
 
     public StatusEffect(String name, int duration, int magnitude) {
         this.name = name;
@@ -29,5 +29,5 @@ public abstract class StatusEffect {
     public abstract void applyEndOfTurn(Character c);
     public abstract void onApply(Character c);
     public abstract void onRemove(Character c);
-    public abstract StatusEffect copy(); // create a fresh independent copy
+    public abstract StatusEffect copy(); 
 }
