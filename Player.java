@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Player extends Character {
     public String heroClass; // accessible to Enemy for targeting
-    private Skill[] skills = new Skill[2];
+    private Skill[] skills = new Skill[2];//asdasdasdasdasd
     private int mpRegen;
 
     public Player(String name, String heroClass, int maxHp, int maxMp, int attack, int defense, int mpRegen) {
