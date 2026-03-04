@@ -10,9 +10,9 @@ public class GameEngine {
 
     // Equipment tiers (index 0 = basic, 1 = improved, 2 = best)
     private Weapon[] weaponTiers = {
-        new Weapon("Iron Sword", 5),
-        new Weapon("Steel Blade", 10),
-        new Weapon("Dragon Slayer", 15)
+        new Weapon("Common Weapon", 5),
+        new Weapon("Rare Weapon", 10),
+        new Weapon("Legendary Weapon", 15)
     };
     private Armor[] armorTiers = {
         new Armor("Leather Armor", 3),
