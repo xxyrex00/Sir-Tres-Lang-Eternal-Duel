@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public abstract class Character {
+public abstract class Character {//asdasdasdasdasdasdasdasd
     protected String name;
     protected int hp, maxHp;
     protected int mp, maxMp;
