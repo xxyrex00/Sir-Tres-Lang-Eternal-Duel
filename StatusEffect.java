@@ -21,7 +21,6 @@ public abstract class StatusEffect {
         return duration == 0;
     }
 
-    @Override
     public String toString() {
         return name + (duration > 0 ? " (" + duration + " turns left)" : (duration == -1 ? " (permanent)" : ""));
     }
