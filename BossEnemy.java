@@ -41,15 +41,16 @@ public class BossEnemy extends Enemy {
 
     @Override
     public void takeTurn(GameEngine engine, Scanner scanner) {
-        processStartOfTurnEffects();
+    processStartOfTurnEffects();
+    if (!isAlive()) return;
 
-        if (!intimidatedUsed) {
-            specialSkill.use(this, engine, scanner);
-            intimidatedUsed = true;
-        } else {
-            super.takeTurn(engine, scanner);
-        }
-
-        processEndOfTurnEffects();
+    if (!intimidatedUsed) {
+        specialSkill.use(this, engine, scanner);
+        intimidatedUsed = true;
+    } else {
+        performAttack(engine);
     }
+
+    processEndOfTurnEffects();
+}
 }

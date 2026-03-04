@@ -54,7 +54,7 @@ public class GameEngine {
             // After each successful encounter (except the last), heal and remove debuffs
             fullHealHeroes();
 
-            // Offer equipment upgrade every 3rd encounter (before the boss)
+            // Offer equipment upgrade every 3rd encounter
             if (encounterNumber % 3 == 0) {
                 offerEquipmentUpgrade();
             }
@@ -155,7 +155,7 @@ public class GameEngine {
                         System.out.println("\n*** All enemies defeated! ***\n");
                         return true;
                     }
-                    System.out.println(); // blank line between turns
+                    System.out.println(); // Make text readable between turns
                 }
             }
 
@@ -163,11 +163,16 @@ public class GameEngine {
             for (int i = 0; i < enemyCount; i++) {
                 if (enemies[i].isAlive()) {
                     enemies[i].takeTurn(this, scanner);
+                    // Check after each enemy action
+                    if (allEnemiesDefeated()) {
+                        System.out.println("\n*** All enemies defeated! ***\n");
+                        return true;
+                    }
                     if (allHeroesDefeated()) {
                         System.out.println("\n*** All heroes have fallen... ***\n");
                         return false;
                     }
-                    System.out.println(); // blank line between turns
+                    System.out.println();
                 }
             }
         }
@@ -238,7 +243,7 @@ public class GameEngine {
         System.out.println("=======================================\n");
     }
 
-    // ==================== INPUT UTILITY ====================
+    // ==================== INPUT CHECKER ====================
     private int getIntInput(int min, int max) {
         int val;
         while (true) {
