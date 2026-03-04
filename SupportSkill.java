@@ -24,10 +24,12 @@ public class SupportSkill extends Skill {
     @Override
     public void use(Character user, GameEngine engine, Scanner scanner) {
         System.out.println(user.name + " uses " + name + "!");
+
+        // Handle healing first (if any)
         if (healAmount > 0) {
             if (onAlly) {
-                // Heal ally (including self)
-                System.out.println("Choose target:");
+                // Heal an ally (including self if chosen)
+                System.out.println("Choose target to heal:");
                 for (int i = 0; i < 2; i++) {
                     Player p = engine.heroes[i];
                     System.out.println((i+1) + ". " + p.name + " (HP: " + p.hp + "/" + p.maxHp + ")");
@@ -35,34 +37,46 @@ public class SupportSkill extends Skill {
                 int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
                 Player target = engine.heroes[targetIdx];
                 target.heal(healAmount);
+                // If there's an effect, apply it to the same target
+                if (effect != null) {
+                    StatusEffect effectCopy = effect.copy();
+                    target.applyStatusEffect(effectCopy);
+                }
             } else {
                 // Self-heal
                 ((Player)user).heal(healAmount);
+                // If there's an effect, apply it to self
+                if (effect != null) {
+                    StatusEffect effectCopy = effect.copy();
+                    user.applyStatusEffect(effectCopy);
+                }
             }
-        }
-        if (effect != null) {
-            if (onAlly) {
-                // Apply buff to ally
-                System.out.println("Choose ally to buff:");
-                for (int i = 0; i < 2; i++) {
-                    Player p = engine.heroes[i];
-                    System.out.println((i+1) + ". " + p.name);
+        } else {
+            // No healing: pure effect skill
+            if (effect != null) {
+                if (onAlly) {
+                    // Apply buff to ally
+                    System.out.println("Choose ally to buff:");
+                    for (int i = 0; i < 2; i++) {
+                        Player p = engine.heroes[i];
+                        System.out.println((i+1) + ". " + p.name);
+                    }
+                    int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
+                    Player target = engine.heroes[targetIdx];
+                    StatusEffect effectCopy = effect.copy();
+                    target.applyStatusEffect(effectCopy);
+                } else {
+                    // Apply debuff to enemy
+                    System.out.println("Choose enemy to debuff:");
+                    for (int i = 0; i < engine.enemyCount; i++) {
+                        Enemy e = engine.enemies[i];
+                        System.out.println((i+1) + ". " + e.name);
+                    }
+                    int targetIdx = getIntInput(scanner, "Target: ", 1, engine.enemyCount) - 1;
+                    Enemy target = engine.enemies[targetIdx];
+                    StatusEffect effectCopy = effect.copy();
+                    target.applyStatusEffect(effectCopy);
                 }
-                int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
-                Player target = engine.heroes[targetIdx];
-                StatusEffect effectCopy = effect.copy();
-                target.applyStatusEffect(effectCopy);
-            } else {
-                // Apply debuff to enemy
-                System.out.println("Choose enemy to debuff:");
-                for (int i = 0; i < engine.enemyCount; i++) {
-                    Enemy e = engine.enemies[i];
-                    System.out.println((i+1) + ". " + e.name);
-                }
-                int targetIdx = getIntInput(scanner, "Target: ", 1, engine.enemyCount) - 1;
-                Enemy target = engine.enemies[targetIdx];
-                StatusEffect effectCopy = effect.copy();
-                target.applyStatusEffect(effectCopy);
             }
         }
     }
