@@ -29,20 +29,17 @@ public abstract class Character {
     public int getMaxMp() { return maxMp; }
 
     public void takeDamage(int dmg) {
-        hp -= dmg;
-        if (hp < 0) hp = 0;
+        hp = Math.max(0, hp - dmg);
         System.out.println(name + " takes " + dmg + " damage. HP: " + hp + "/" + maxHp);
     }
 
     public void heal(int amount) {
-        hp += amount;
-        if (hp > maxHp) hp = maxHp;
+        hp = Math.min(maxHp, hp + amount);
         System.out.println(name + " heals " + amount + " HP. HP: " + hp + "/" + maxHp);
     }
 
     public void restoreMp(int amount) {
-        mp += amount;
-        if (mp > maxMp) mp = maxMp;
+        mp = Math.min(maxMp, mp + amount);
     }
 
     public boolean useMp(int cost) {
@@ -71,10 +68,9 @@ public abstract class Character {
                 statusEffect.duration += newEffect.duration;
                 System.out.println(name + "'s " + statusEffect.name + " duration extended to " + statusEffect.duration + " turns.");
                 return;
-            } else {
-                System.out.println(name + " already has a different effect (" + statusEffect + ") – cannot apply " + newEffect + ".");
-                return;
             }
+            System.out.println(name + " already has a different effect (" + statusEffect + ") – cannot apply " + newEffect + ".");
+            return;
         }
         // No existing effect
         statusEffect = newEffect;

@@ -28,16 +28,27 @@ public class Player extends Character {
         processStartOfTurnEffects(); // Bug 4 fix: was missing entirely
         if (!isAlive()) return;      // Safety check in case a start-of-turn effect kills the player
 
-        // Display enemy status at the start of the turn
-        System.out.println("--- Current Enemies ---");
+        // UI #6: Clearer turn banner
+        System.out.println("=======================================");
+        System.out.println("        " + name.toUpperCase() + "'S TURN (" + heroClass + ")");
+        System.out.println("=======================================");
+
+        // UI #1+2: Show both heroes and enemies with status effects
+        System.out.println("  --- HEROES ---");
+        for (Player p : engine.heroes) {
+            String status = p.statusEffect != null ? " [" + p.statusEffect + "]" : "";
+            System.out.printf("    %-12s HP: %d/%d | MP: %d/%d%s%n",
+                p.name + " (" + p.heroClass + ")", p.hp, p.maxHp, p.mp, p.maxMp, status);
+        }
+        System.out.println("  --- ENEMIES ---");
         for (int i = 0; i < engine.enemyCount; i++) {
             Enemy e = engine.enemies[i];
             if (e.isAlive()) {
-                System.out.println("  " + (i+1) + ". " + e.name + " HP " + e.hp + "/" + e.maxHp);
+                String status = e.statusEffect != null ? " [" + e.statusEffect + "]" : "";
+                System.out.printf("    %d. %-10s HP: %d/%d%s%n", i+1, e.name, e.hp, e.maxHp, status);
             }
         }
-
-        System.out.println("\n--- " + name + "'s turn ---");
+        System.out.println("=======================================");
         System.out.println("  HP: " + hp + "/" + maxHp + " | MP: " + mp + "/" + maxMp);
         System.out.println("  1. Attack");
         System.out.println("  2. Use Skill");
@@ -50,26 +61,39 @@ public class Player extends Character {
             int targetIdx = getValidEnemyTarget(engine, scanner, "Choose target:");
             if (targetIdx == -1) return; // no alive enemies
             Enemy target = engine.enemies[targetIdx];
-            int damage = getTotalAttack() - target.getTotalDefense();
-            if (damage < 1) damage = 1;
+            int damage = Math.max(1, getTotalAttack() - target.getTotalDefense());
             System.out.println("  " + name + " attacks " + target.name + " for " + damage + " damage!");
             target.takeDamage(damage);
+            // UI #5: Combat result summary
+            if (!target.isAlive()) {
+                System.out.println("  >> *** " + target.name + " defeated! ***");
+            } else {
+                System.out.printf("  >> %s: %d/%d HP remaining%n", target.name, target.hp, target.maxHp);
+            }
         } else {
             // Use skill
             System.out.println("  Choose skill:");
             for (int i = 0; i < skills.length; i++) {
-                System.out.println("    " + (i+1) + ". " + skills[i].getName() + " (MP cost: " + skills[i].getMpCost() + ")");
+                System.out.printf("    %d. %s (MP cost: %d)%n", i+1, skills[i].getName(), skills[i].getMpCost());
             }
             int skillIdx = getIntInput(scanner, "  Skill: ", 1, 2) - 1;
             Skill skill = skills[skillIdx];
+            // UI #4: Better MP feedback
             if (!useMp(skill.getMpCost())) {
-                System.out.println("  Not enough MP!");
+                System.out.println("  Not enough MP! (Need " + skill.getMpCost() + " MP, have " + mp + " MP)");
                 return;
             }
             skill.use(this, engine, scanner);
         }
 
         // End of turn: regenerate MP and process effects
+        // Skip if all enemies are already defeated (e.g. after a DamageSkill kills the last enemy)
+        boolean allDefeated = true;
+        for (int i = 0; i < engine.enemyCount; i++) {
+            if (engine.enemies[i].isAlive()) { allDefeated = false; break; }
+        }
+        if (allDefeated) return;
+
         System.out.println(); // blank line before regen
         regenerateMp();
         processEndOfTurnEffects();
@@ -83,7 +107,7 @@ public class Player extends Character {
                 Enemy e = engine.enemies[i];
                 if (e.isAlive()) {
                     aliveCount++;
-                    System.out.println("    " + (i+1) + ". " + e.name + " (HP: " + e.hp + "/" + e.maxHp + ")");
+                    System.out.printf("    %d. %s (HP: %d/%d)%n", i+1, e.name, e.hp, e.maxHp);
                 }
             }
             if (aliveCount == 0) {

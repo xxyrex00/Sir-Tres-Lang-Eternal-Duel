@@ -22,7 +22,9 @@ public abstract class StatusEffect {
     }
 
     public String toString() {
-        return name + (duration > 0 ? " (" + duration + " turns left)" : (duration == -1 ? " (permanent)" : ""));
+        if (duration == -1) return name + " (permanent)";
+        if (duration > 0)   return name + " (" + duration + " turns left)";
+        return name;
     }
 
     public abstract void applyStartOfTurn(Character c);

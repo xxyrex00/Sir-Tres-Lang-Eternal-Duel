@@ -8,47 +8,73 @@ public class GameEngine {
     private int encounterNumber = 0;                // Current encounter (1-8)
     private Scanner scanner = new Scanner(System.in);
 
-    // Equipment tiers (index 0 = basic, 1 = improved, 2 = best)
-    private Weapon[] weaponTiers = {
-        new Weapon("Common Weapon", 5),
-        new Weapon("Rare Weapon", 10),
-        new Weapon("Legendary Weapon", 15)
-    };
-    private Armor[] armorTiers = {
-        new Armor("Leather Armor", 3),
-        new Armor("Chain Mail", 6),
-        new Armor("Dragon Scale", 10)
-    };
+    // Equipment tiers per class (index 0 = basic, 1 = improved, 2 = best)
+    private Weapon[] warriorWeapons = { new Weapon("Iron Sword", 5),      new Weapon("Steel Blade", 10),     new Weapon("Dragonbane", 15) };
+    private Weapon[] mageWeapons    = { new Weapon("Wooden Staff", 5),    new Weapon("Enchanted Staff", 10), new Weapon("Arcane Scepter", 15) };
+    private Weapon[] archerWeapons  = { new Weapon("Short Bow", 5),       new Weapon("Longbow", 10),         new Weapon("Elven Bow", 15) };
+
+    private Armor[] warriorArmors   = { new Armor("Leather Armor", 3),    new Armor("Chain Mail", 6),        new Armor("Dragon Scale", 10) };
+    private Armor[] mageArmors      = { new Armor("Cloth Robe", 3),       new Armor("Enchanted Robe", 6),    new Armor("Arcane Vestment", 10) };
+    private Armor[] archerArmors    = { new Armor("Leather Vest", 3),     new Armor("Ranger Coat", 6),       new Armor("Shadow Cloak", 10) };
+
+    private Weapon[] getWeaponTiers(Player p) {
+        switch (p.heroClass) {
+            case "Mage":   return mageWeapons;
+            case "Archer": return archerWeapons;
+            default:       return warriorWeapons;
+        }
+    }
+
+    private Armor[] getArmorTiers(Player p) {
+        switch (p.heroClass) {
+            case "Mage":   return mageArmors;
+            case "Archer": return archerArmors;
+            default:       return warriorArmors;
+        }
+    }
 
     // MAIN GAME LOOP
     public void start() {
-        System.out.println("=======================================");
-        System.out.println("           ETERNAL DUEL                ");
-        System.out.println("=======================================\n");
+        printSeparator();
+        System.out.println("            ETERNAL DUEL");
+        printSeparator();
+        System.out.println();
         createCharacters();
         equipInitialGear();
 
         // Encounter loop (max 8)
         for (encounterNumber = 1; encounterNumber <= 8; encounterNumber++) {
-            System.out.println("\n=======================================");
-            System.out.println("           ENCOUNTER " + encounterNumber);
-            System.out.println("=======================================\n");
+            System.out.println();
             boolean isBoss = (encounterNumber % 4 == 0);
+            printSeparator();
+            if (isBoss) {
+                System.out.println("         ENCOUNTER " + encounterNumber + " - BOSS!");
+                printSeparator();
+                System.out.println("      *** A powerful enemy approaches! ***");
+            } else {
+                System.out.println("             ENCOUNTER " + encounterNumber);
+            }
+            printSeparator();
+            System.out.println();
             generateEnemies(isBoss);
             boolean victory = runCombat();
 
             if (!victory) {
-                System.out.println("\n=======================================");
-                System.out.println("             GAME OVER                 ");
-                System.out.println("=======================================\n");
+                System.out.println();
+                printSeparator();
+                System.out.println("              GAME OVER");
+                printSeparator();
+                System.out.println();
                 scanner.close();
                 return;
             }
 
             if (encounterNumber == 8) {
-                System.out.println("\n=======================================");
-                System.out.println("             YOU WIN!                  ");
-                System.out.println("=======================================\n");
+                System.out.println();
+                printSeparator();
+                System.out.println("               YOU WIN!");
+                printSeparator();
+                System.out.println();
                 scanner.close();
                 return;
             }
@@ -56,8 +82,8 @@ public class GameEngine {
             // After each successful encounter (except the last), heal and remove debuffs
             fullHealHeroes();
 
-            // Offer equipment upgrade every 3rd encounter
-            if (encounterNumber % 3 == 0) {
+            // Offer equipment upgrade before every boss encounter (encounter 3 and 7)
+            if (encounterNumber == 3 || encounterNumber == 7) {
                 offerEquipmentUpgrade();
             }
         }
@@ -114,8 +140,8 @@ public class GameEngine {
 
     private void equipInitialGear() {
         for (Player p : heroes) {
-            p.equipWeapon(weaponTiers[0]);
-            p.equipArmor(armorTiers[0]);
+            p.equipWeapon(getWeaponTiers(p)[0]);
+            p.equipArmor(getArmorTiers(p)[0]);
         }
         System.out.println("\nAll heroes equipped with basic gear.\n");
     }
@@ -130,15 +156,9 @@ public class GameEngine {
             for (int i = 0; i < enemyCount; i++) {
                 int type = (int)(Math.random() * 3); // 0, 1, or 2
                 switch (type) {
-                    case 0:
-                        enemies[i] = new Enemy("Goblin", 40, 0, 12, 2, 1);
-                        break;
-                    case 1:
-                        enemies[i] = new Enemy("Orc", 60, 0, 16, 4, 2);
-                        break;
-                    case 2:
-                        enemies[i] = new Enemy("Troll", 80, 0, 20, 6, 3);
-                        break;
+                    case 0: enemies[i] = new Enemy("Goblin", 40, 0, 12, 2, 1); break;
+                    case 1: enemies[i] = new Enemy("Orc",    60, 0, 16, 4, 2); break;
+                    case 2: enemies[i] = new Enemy("Troll",  80, 0, 20, 6, 3); break;
                 }
             }
         }
@@ -154,7 +174,7 @@ public class GameEngine {
                 if (heroes[i].isAlive()) {
                     heroes[i].takeTurn(this, scanner);
                     if (allEnemiesDefeated()) {
-                        System.out.println("\n*** All enemies defeated! ***\n");
+                        printVictorySummary();
                         return true;
                     }
                     System.out.println(); // Make text readable between turns
@@ -167,7 +187,7 @@ public class GameEngine {
                     enemies[i].takeTurn(this, scanner);
                     // Check after each enemy action
                     if (allEnemiesDefeated()) {
-                        System.out.println("\n*** All enemies defeated! ***\n");
+                        printVictorySummary();
                         return true;
                     }
                     if (allHeroesDefeated()) {
@@ -205,47 +225,75 @@ public class GameEngine {
     }
 
     private void offerEquipmentUpgrade() {
-        System.out.println("\n=======================================");
-        System.out.println("      New Equipment Found!            ");
-        System.out.println("=======================================\n");
-        int tierIndex = encounterNumber / 3; // encounterNumber is 3 or 6 → index 1 or 2
+        System.out.println();
+        printSeparator();
+        System.out.println("          New Equipment Found!");
+        printSeparator();
+        System.out.println();
+        int tierIndex = (encounterNumber == 3) ? 1 : 2; // encounter 3 → tier 1, encounter 7 → tier 2
 
         for (int i = 0; i < 2; i++) {
             Player p = heroes[i];
-            System.out.println("--- " + p.name + " (" + p.heroClass + ") ---\n");
+            System.out.println("--- " + p.name + " (" + p.heroClass + ") ---");
 
-            // Weapon upgrade choice
-            Weapon newWeapon = weaponTiers[tierIndex];
-            System.out.println("Found weapon: " + newWeapon.getName() + " (+" + newWeapon.getAttackBonus() + " attack)");
-            System.out.println("Current weapon: " + (p.weapon != null ? p.weapon.getName() + " (+" + p.weapon.getAttackBonus() + ")" : "none"));
-            System.out.println("  1. Replace");
-            System.out.println("  2. Keep current");
-            int choice = getIntInput(1, 2);
-            if (choice == 1) {
-                p.equipWeapon(newWeapon);
-                System.out.println(p.name + " now wields " + newWeapon.getName() + "!\n");
-            } else {
-                System.out.println(p.name + " keeps their current weapon.\n");
-            }
+            Weapon newWeapon = getWeaponTiers(p)[tierIndex];
+            Armor newArmor   = getArmorTiers(p)[tierIndex];
 
-            // Armor upgrade choice
-            Armor newArmor = armorTiers[tierIndex];
-            System.out.println("Found armor: " + newArmor.getName() + " (+" + newArmor.getDefenseBonus() + " defense)");
-            System.out.println("Current armor: " + (p.armor != null ? p.armor.getName() + " (+" + p.armor.getDefenseBonus() + ")" : "none"));
-            System.out.println("  1. Replace");
-            System.out.println("  2. Keep current");
-            choice = getIntInput(1, 2);
-            if (choice == 1) {
-                p.equipArmor(newArmor);
-                System.out.println(p.name + " now wears " + newArmor.getName() + "!\n");
-            } else {
-                System.out.println(p.name + " keeps their current armor.\n");
+            int weaponDiff = newWeapon.getAttackBonus() - (p.weapon != null ? p.weapon.getAttackBonus() : 0);
+            int armorDiff  = newArmor.getDefenseBonus() - (p.armor  != null ? p.armor.getDefenseBonus()  : 0);
+
+            System.out.println("  Weapon: " + newWeapon.getName() + " (+" + newWeapon.getAttackBonus() + " atk)"
+                + "  |  Current: " + (p.weapon != null ? p.weapon.getName() : "none")
+                + "  |  Upgrade: " + (weaponDiff >= 0 ? "+" : "") + weaponDiff + " atk");
+
+            System.out.println("  Armor:  " + newArmor.getName() + " (+" + newArmor.getDefenseBonus() + " def)"
+                + "  |  Current: " + (p.armor != null ? p.armor.getName() : "none")
+                + "  |  Upgrade: " + (armorDiff >= 0 ? "+" : "") + armorDiff + " def");
+
+            System.out.println("  1. Take both          2. Take weapon only");
+            System.out.println("  3. Take armor only    4. Keep current gear");
+            int choice = getIntInput(1, 4);
+            switch (choice) {
+                case 1:
+                    p.equipWeapon(newWeapon);
+                    p.equipArmor(newArmor);
+                    System.out.println("  " + p.name + " equips " + newWeapon.getName() + " and " + newArmor.getName() + "!\n");
+                    break;
+                case 2:
+                    p.equipWeapon(newWeapon);
+                    System.out.println("  " + p.name + " equips " + newWeapon.getName() + "!\n");
+                    break;
+                case 3:
+                    p.equipArmor(newArmor);
+                    System.out.println("  " + p.name + " equips " + newArmor.getName() + "!\n");
+                    break;
+                case 4:
+                    System.out.println("  " + p.name + " keeps their current gear.\n");
+                    break;
             }
         }
-        System.out.println("=======================================\n");
+        printSeparator();
+        System.out.println();
+    }
+
+    private void printVictorySummary() {
+        int heroesAlive = 0;
+        for (Player p : heroes) { if (p.isAlive()) heroesAlive++; }
+        System.out.println();
+        printSeparator();
+        System.out.println("             *** VICTORY! ***");
+        System.out.println("          Enemies defeated: " + enemyCount);
+        System.out.println("          Heroes remaining: " + heroesAlive + "/2");
+        if (encounterNumber < 8) System.out.println("    Proceeding to encounter " + (encounterNumber + 1) + "...");
+        printSeparator();
+        System.out.println();
     }
 
     // INPUT CHECKER
+    private void printSeparator() {
+        System.out.println("=======================================");
+    }
+
     private int getIntInput(int min, int max) {
         int val;
         while (true) {

@@ -18,12 +18,10 @@ public class DamageSkill extends Skill {
         for (int i = 0; i < engine.enemyCount; i++) {
             Enemy e = engine.enemies[i];
             if (!e.isAlive()) continue; // skip dead enemies
-            int finalDmg = damage - e.getTotalDefense();
-            if (finalDmg < 1) finalDmg = 1;
+            int finalDmg = Math.max(1, damage - e.getTotalDefense());
             e.takeDamage(finalDmg);
             if (effect != null && e.isAlive()) {
-                StatusEffect effectCopy = effect.copy();
-                e.applyStatusEffect(effectCopy);
+                e.applyStatusEffect(effect.copy());
             }
         }
     }

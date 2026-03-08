@@ -38,8 +38,7 @@ public class Enemy extends Character {
         }
         if (target == null) return;
     
-        int damage = getTotalAttack() - target.getTotalDefense();
-        if (damage < 1) damage = 1;
+        int damage = Math.max(1, getTotalAttack() - target.getTotalDefense());
         System.out.println(name + " attacks " + target.name + " for " + damage + " damage!");
         target.takeDamage(damage);
     }

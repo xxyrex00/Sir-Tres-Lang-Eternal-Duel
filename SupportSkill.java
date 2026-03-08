@@ -24,23 +24,23 @@ public class SupportSkill extends Skill {
                 System.out.println("Choose target to heal:");
                 for (int i = 0; i < 2; i++) {
                     Player p = engine.heroes[i];
-                    System.out.println((i+1) + ". " + p.name + " (HP: " + p.hp + "/" + p.maxHp + ")");
+                    if (p.isAlive()) {
+                        System.out.printf("  %d. %s (HP: %d/%d)%n", i+1, p.name, p.hp, p.maxHp);
+                    }
                 }
                 int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
                 Player target = engine.heroes[targetIdx];
                 target.heal(healAmount);
                 // If there's an effect, apply it to the same target
                 if (effect != null) {
-                    StatusEffect effectCopy = effect.copy();
-                    target.applyStatusEffect(effectCopy);
+                    target.applyStatusEffect(effect.copy());
                 }
             } else {
                 // Self-heal
                 ((Player)user).heal(healAmount);
                 // If there's an effect, apply it to self
                 if (effect != null) {
-                    StatusEffect effectCopy = effect.copy();
-                    user.applyStatusEffect(effectCopy);
+                    user.applyStatusEffect(effect.copy());
                 }
             }
         } else {
@@ -55,15 +55,13 @@ public class SupportSkill extends Skill {
                     }
                     int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
                     Player target = engine.heroes[targetIdx];
-                    StatusEffect effectCopy = effect.copy();
-                    target.applyStatusEffect(effectCopy);
+                    target.applyStatusEffect(effect.copy());
                 } else {
                     // Apply debuff to enemy
                     int targetIdx = getValidEnemyTarget(engine, scanner, "Choose enemy to debuff:");
                     if (targetIdx == -1) return; // no alive enemies
                     Enemy target = engine.enemies[targetIdx];
-                    StatusEffect effectCopy = effect.copy();
-                    target.applyStatusEffect(effectCopy);
+                    target.applyStatusEffect(effect.copy());
                 }
             }
         }
@@ -77,7 +75,7 @@ public class SupportSkill extends Skill {
                 Enemy e = engine.enemies[i];
                 if (e.isAlive()) {
                     aliveCount++;
-                    System.out.println("  " + (i+1) + ". " + e.name + " (HP: " + e.hp + "/" + e.maxHp + ")");
+                    System.out.printf("  %d. %s (HP: %d/%d)%n", i+1, e.name, e.hp, e.maxHp);
                 }
             }
             if (aliveCount == 0) {
