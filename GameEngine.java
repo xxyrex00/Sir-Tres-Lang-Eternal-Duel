@@ -2,20 +2,20 @@ import java.util.Scanner;
 
 public class GameEngine {
     // Core game data
-    public Player[] heroes = new Player[2];       // Two player characters
+    public Player[] heroes = new Player[3];       // Three player characters
     public Enemy[] enemies = new Enemy[3];        // Max number of enemies per encounter
     public int enemyCount;                         // Actual number of enemies in current encounter
     private int encounterNumber = 0;                // Current encounter (1-8)
     private Scanner scanner = new Scanner(System.in);
 
     // Equipment tiers per class (index 0 = basic, 1 = improved, 2 = best)
-    private Weapon[] warriorWeapons = { new Weapon("Iron Sword", 5),      new Weapon("Steel Blade", 10),     new Weapon("Dragonbane", 15) };
-    private Weapon[] mageWeapons    = { new Weapon("Wooden Staff", 5),    new Weapon("Enchanted Staff", 10), new Weapon("Arcane Scepter", 15) };
-    private Weapon[] archerWeapons  = { new Weapon("Short Bow", 5),       new Weapon("Longbow", 10),         new Weapon("Elven Bow", 15) };
+    private Weapon[] warriorWeapons = { new Weapon("Iron Sword", 4),      new Weapon("Steel Blade", 8),      new Weapon("Dragonbane", 12) };
+    private Weapon[] mageWeapons    = { new Weapon("Wooden Staff", 4),    new Weapon("Enchanted Staff", 8),  new Weapon("Arcane Scepter", 12) };
+    private Weapon[] archerWeapons  = { new Weapon("Short Bow", 4),       new Weapon("Longbow", 8),          new Weapon("Elven Bow", 12) };
 
-    private Armor[] warriorArmors   = { new Armor("Leather Armor", 3),    new Armor("Chain Mail", 6),        new Armor("Dragon Scale", 10) };
-    private Armor[] mageArmors      = { new Armor("Cloth Robe", 3),       new Armor("Enchanted Robe", 6),    new Armor("Arcane Vestment", 10) };
-    private Armor[] archerArmors    = { new Armor("Leather Vest", 3),     new Armor("Ranger Coat", 6),       new Armor("Shadow Cloak", 10) };
+    private Armor[] warriorArmors   = { new Armor("Leather Armor", 2),    new Armor("Chain Mail", 5),        new Armor("Dragon Scale", 8) };
+    private Armor[] mageArmors      = { new Armor("Cloth Robe", 2),       new Armor("Enchanted Robe", 5),    new Armor("Arcane Vestment", 8) };
+    private Armor[] archerArmors    = { new Armor("Leather Vest", 2),     new Armor("Ranger Coat", 5),       new Armor("Shadow Cloak", 8) };
 
     private Weapon[] getWeaponTiers(Player p) {
         switch (p.heroClass) {
@@ -46,11 +46,29 @@ public class GameEngine {
         for (encounterNumber = 1; encounterNumber <= 8; encounterNumber++) {
             System.out.println();
             boolean isBoss = (encounterNumber % 4 == 0);
+            boolean isArea2 = (encounterNumber >= 5);
+
+            // Show area banner at start of each area
+            if (encounterNumber == 1 || encounterNumber == 5) {
+                printSeparator();
+                if (isArea2) {
+                    System.out.println("        AREA 2 - ANCIENT CRYPT");
+                    printSeparator();
+                    System.out.println("     The air reeks of death and decay...");
+                } else {
+                    System.out.println("        AREA 1 - GOBLIN CAMP");
+                    printSeparator();
+                    System.out.println("      A foul stench fills the air...");
+                }
+                printSeparator();
+                System.out.println();
+            }
             printSeparator();
             if (isBoss) {
+                String bossName = (encounterNumber == 4) ? "Goblin King" : "Lich King";
                 System.out.println("         ENCOUNTER " + encounterNumber + " - BOSS!");
                 printSeparator();
-                System.out.println("      *** A powerful enemy approaches! ***");
+                System.out.println("          *** " + bossName + " appears! ***");
             } else {
                 System.out.println("             ENCOUNTER " + encounterNumber);
             }
@@ -92,49 +110,46 @@ public class GameEngine {
     // INITIALIZATION
     private void createCharacters() {
         System.out.println("---------- Character Creation ----------\n");
-        System.out.println("Create Hero 1:");
-        heroes[0] = createHero(1);
-        System.out.println("\nCreate Hero 2:");
-        heroes[1] = createHero(2);
+        System.out.println("Create Hero 1 (Warrior):");
+        heroes[0] = createHero("Warrior");
+        System.out.println("\nCreate Hero 2 (Archer):");
+        heroes[1] = createHero("Archer");
+        System.out.println("\nCreate Hero 3 (Mage):");
+        heroes[2] = createHero("Mage");
         System.out.println("\n---------- Creation Complete ----------\n");
     }
 
-    private Player createHero(int number) {
-        System.out.println("Choose class for Hero " + number + ":");
-        System.out.println("  1. Warrior");
-        System.out.println("  2. Mage");
-        System.out.println("  3. Archer");
-        int classChoice = getIntInput(1, 3);
-        System.out.print("Enter name: ");
+    private Player createHero(String heroClass) {
+        System.out.print("  Enter name: ");
         String name = scanner.nextLine();
 
         Player p;
-        switch (classChoice) {
-            case 1: // Warrior
-                p = new Player(name, "Warrior", 100, 50, 20, 10, 5);
+        switch (heroClass) {
+            case "Warrior":
+                p = new Player(name, "Warrior", 120, 40, 18, 12, 3);
                 p.setSkills(
-                    new DamageSkill("Whirlwind Slash", 10, 15, null),
-                    new SupportSkill("Second Wind", 8, false, 20, new DefenseBuffEffect(10, 2))
+                    new DamageSkill("Shield Bash", 12, 12, new DefenseDebuffEffect(10, 2), true),
+                    new SupportSkill("Second Wind", 10, false, 15, new DefenseBuffEffect(8, 3))
                 );
                 break;
-            case 2: // Mage
-                p = new Player(name, "Mage", 70, 80, 15, 5, 10);
+            case "Mage":
+                p = new Player(name, "Mage", 85, 100, 12, 4, 12);
                 p.setSkills(
-                    new DamageSkill("Firestorm", 15, 20, new BurnEffect(5, 2)),
-                    new SupportSkill("Cure Wound", 10, true, 25, null)
+                    new DamageSkill("Firestorm", 18, 22, new BurnEffect(8, 3)),
+                    new SupportSkill("Frost Armor", 12, true, 0, new DefenseBuffEffect(8, 3))
                 );
                 break;
-            case 3: // Archer
-                p = new Player(name, "Archer", 80, 60, 18, 7, 7);
+            case "Archer":
+                p = new Player(name, "Archer", 90, 70, 15, 7, 7);
                 p.setSkills(
-                    new DamageSkill("Poison Volley", 12, 18, new PoisonEffect(5, 2)),
-                    new SupportSkill("Hunter's Mark", 8, false, 0, new DefenseDebuffEffect(15, 2))
+                    new DamageSkill("Poison Volley", 14, 16, new PoisonEffect(6, 3)),
+                    new DamageSkill("Aimed Shot", 16, 30, null, true)
                 );
                 break;
             default:
-                p = null; // Should never happen
+                p = null;
         }
-        System.out.println("Hero created: " + p.name + " the " + p.heroClass);
+        System.out.println("  Hero created: " + p.name + " the " + p.heroClass);
         return p;
     }
 
@@ -150,15 +165,31 @@ public class GameEngine {
     private void generateEnemies(boolean isBoss) {
         if (isBoss) {
             enemyCount = 1;
-            enemies[0] = new BossEnemy("Goblin King", 150, 0, 25, 8, 1);
-        } else {
-            enemyCount = (int)(Math.random() * 3) + 1; // 1 to 3 enemies
+            if (encounterNumber == 4) {
+                enemies[0] = new BossEnemy("Goblin King", 150, 0, 25, 8, 1);
+            } else {
+                enemies[0] = new BossEnemy("Lich King", 220, 0, 32, 10, 1);
+            }
+        } else if (encounterNumber <= 3) {
+            // Area 1 — Goblin Camp
+            enemyCount = (int)(Math.random() * 3) + 1;
             for (int i = 0; i < enemyCount; i++) {
-                int type = (int)(Math.random() * 3); // 0, 1, or 2
+                int type = (int)(Math.random() * 3);
                 switch (type) {
-                    case 0: enemies[i] = new Enemy("Goblin", 40, 0, 12, 2, 1); break;
-                    case 1: enemies[i] = new Enemy("Orc",    60, 0, 16, 4, 2); break;
-                    case 2: enemies[i] = new Enemy("Troll",  80, 0, 20, 6, 3); break;
+                    case 0: enemies[i] = new Enemy("Goblin Scout",   32, 0, 11, 2, 1); break;
+                    case 1: enemies[i] = new Enemy("Goblin Warrior", 50, 0, 15, 4, 2); break;
+                    case 2: enemies[i] = new Enemy("Hobgoblin",      70, 0, 19, 6, 3); break;
+                }
+            }
+        } else {
+            // Area 2 — Ancient Crypt
+            enemyCount = (int)(Math.random() * 3) + 1;
+            for (int i = 0; i < enemyCount; i++) {
+                int type = (int)(Math.random() * 3);
+                switch (type) {
+                    case 0: enemies[i] = new Enemy("Skeleton", 55, 0, 16, 5, 1); break;
+                    case 1: enemies[i] = new Enemy("Zombie",   80, 0, 19, 8, 2); break;
+                    case 2: enemies[i] = new Enemy("Wraith",   90, 0, 22, 10, 3); break;
                 }
             }
         }
@@ -170,7 +201,7 @@ public class GameEngine {
 
         while (true) {
             // Players' turns (always first)
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 3; i++) {
                 if (heroes[i].isAlive()) {
                     heroes[i].takeTurn(this, scanner);
                     if (allEnemiesDefeated()) {
@@ -208,7 +239,7 @@ public class GameEngine {
     }
 
     private boolean allHeroesDefeated() {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             if (heroes[i].isAlive()) return false;
         }
         return true;
@@ -217,11 +248,11 @@ public class GameEngine {
     // POST-ENCOUNTER ACTIONS
     private void fullHealHeroes() {
         for (Player p : heroes) {
-            p.hp = p.maxHp;
-            p.mp = p.maxMp;
-            p.removeStatusEffect(); // Clears any lingering debuffs (e.g., Intimidate)
+            p.hp = Math.min(p.maxHp, p.hp + (int)(p.maxHp * 0.7)); // restore 70% of max HP
+            p.mp = Math.min(p.maxMp, p.mp + (int)(p.maxMp * 0.9)); // restore 90% of max MP
+            p.removeAllStatusEffects(); // Clears any lingering debuffs (e.g., Intimidate)
         }
-        System.out.println("\n*** Heroes fully healed and restored! ***\n");
+        System.out.println("\n*** Heroes rest and recover (70% HP, 90% MP restored)! ***\n");
     }
 
     private void offerEquipmentUpgrade() {
@@ -232,7 +263,7 @@ public class GameEngine {
         System.out.println();
         int tierIndex = (encounterNumber == 3) ? 1 : 2; // encounter 3 → tier 1, encounter 7 → tier 2
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             Player p = heroes[i];
             System.out.println("--- " + p.name + " (" + p.heroClass + ") ---");
 
@@ -283,7 +314,7 @@ public class GameEngine {
         printSeparator();
         System.out.println("             *** VICTORY! ***");
         System.out.println("          Enemies defeated: " + enemyCount);
-        System.out.println("          Heroes remaining: " + heroesAlive + "/2");
+        System.out.println("          Heroes remaining: " + heroesAlive + "/3");
         if (encounterNumber < 8) System.out.println("    Proceeding to encounter " + (encounterNumber + 1) + "...");
         printSeparator();
         System.out.println();
