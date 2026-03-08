@@ -41,6 +41,7 @@ public class GameEngine {
                 System.out.println("\n=======================================");
                 System.out.println("             GAME OVER                 ");
                 System.out.println("=======================================\n");
+                scanner.close();
                 return;
             }
 
@@ -48,6 +49,7 @@ public class GameEngine {
                 System.out.println("\n=======================================");
                 System.out.println("             YOU WIN!                  ");
                 System.out.println("=======================================\n");
+                scanner.close();
                 return;
             }
 

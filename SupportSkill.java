@@ -13,14 +13,6 @@ public class SupportSkill extends Skill {
         this.effect = effect;
     }
 
-    // For skills with custom use 
-    public SupportSkill(String name, int mpCost) {
-        super(name, mpCost);
-        this.onAlly = false;
-        this.healAmount = 0;
-        this.effect = null;
-    }
-
     @Override
     public void use(Character user, GameEngine engine, Scanner scanner) {
         System.out.println(user.name + " uses " + name + "!");

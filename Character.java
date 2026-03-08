@@ -22,6 +22,12 @@ public abstract class Character {
 
     public boolean isAlive() { return hp > 0; }
 
+    public String getName() { return name; }
+    public int getHp() { return hp; }
+    public int getMaxHp() { return maxHp; }
+    public int getMp() { return mp; }
+    public int getMaxMp() { return maxMp; }
+
     public void takeDamage(int dmg) {
         hp -= dmg;
         if (hp < 0) hp = 0;

@@ -1,6 +1,9 @@
 public class BurnEffect extends StatusEffect {
+    private int baseMagnitude;
+
     public BurnEffect(int magnitude, int duration) {
         super("Burn", duration, magnitude);
+        this.baseMagnitude = magnitude;
     }
 
     @Override
@@ -22,6 +25,6 @@ public class BurnEffect extends StatusEffect {
 
     @Override
     public StatusEffect copy() {
-        return new BurnEffect(this.magnitude, this.duration);
+        return new BurnEffect(this.baseMagnitude, this.duration);
     }
 }

@@ -1,6 +1,9 @@
 public class PoisonEffect extends StatusEffect {
+    private int baseMagnitude;
+
     public PoisonEffect(int magnitude, int duration) {
         super("Poison", duration, magnitude);
+        this.baseMagnitude = magnitude;
     }
 
     @Override
@@ -22,6 +25,6 @@ public class PoisonEffect extends StatusEffect {
 
     @Override
     public StatusEffect copy() {
-        return new PoisonEffect(this.magnitude, this.duration);
+        return new PoisonEffect(this.baseMagnitude, this.duration);
     }
 }

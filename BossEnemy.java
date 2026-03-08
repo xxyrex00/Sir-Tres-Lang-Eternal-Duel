@@ -7,48 +7,55 @@ public class BossEnemy extends Enemy {
         super(name, maxHp, maxMp, attack, defense, priority);
     }
 
+    private static class IntimidateEffect extends StatusEffect {
+        public IntimidateEffect() {
+            super("AttackDebuff", -1, 5);
+        }
+
+        @Override
+        public void applyStartOfTurn(Character c) { }
+
+        @Override
+        public void applyEndOfTurn(Character c) { }
+
+        @Override
+        public void onApply(Character c) {
+            c.attack -= 5;
+            System.out.println(c.name + "'s attack decreased by 5.");
+        }
+
+        @Override
+        public void onRemove(Character c) {
+            c.attack += 5;
+        }
+
+        @Override
+        public StatusEffect copy() {
+            return new IntimidateEffect();
+        }
+    }
+
     private void doIntimidate(GameEngine engine) {
-        // Bug 5 fix: using BossEnemy.this.name to refer to the boss's name instead of the skill's name
         System.out.println(BossEnemy.this.name + " uses Intimidate! All heroes' attack reduced by 5 for the rest of the battle.");
         for (Player p : engine.heroes) {
             if (p.isAlive()) {
-                StatusEffect intimidateEffect = new StatusEffect("AttackDebuff", -1, 5) {
-                    @Override
-                    public void applyStartOfTurn(Character c) { }
-                    @Override
-                    public void applyEndOfTurn(Character c) { }
-                    @Override
-                    public void onApply(Character c) {
-                        c.attack -= 5;
-                        System.out.println(c.name + "'s attack decreased by 5.");
-                    }
-                    @Override
-                    public void onRemove(Character c) {
-                        c.attack += 5;
-                    }
-                    @Override
-                    public StatusEffect copy() {
-                        // This effect is unique and never copied, so returning this is safe.
-                        return this;
-                    }
-                };
-                p.applyStatusEffect(intimidateEffect);
+                p.applyStatusEffect(new IntimidateEffect());
             }
         }
     }
 
     @Override
     public void takeTurn(GameEngine engine, Scanner scanner) {
-    processStartOfTurnEffects();
-    if (!isAlive()) return;
+        processStartOfTurnEffects();
+        if (!isAlive()) return;
 
-    if (!intimidatedUsed) {
-        doIntimidate(engine);
-        intimidatedUsed = true;
-    } else {
-        performAttack(engine);
+        if (!intimidatedUsed) {
+            doIntimidate(engine);
+            intimidatedUsed = true;
+        } else {
+            performAttack(engine);
+        }
+
+        processEndOfTurnEffects();
     }
-
-    processEndOfTurnEffects();
-}
 }
