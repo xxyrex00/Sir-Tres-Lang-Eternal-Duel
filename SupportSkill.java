@@ -67,17 +67,36 @@ public class SupportSkill extends Skill {
                     target.applyStatusEffect(effectCopy);
                 } else {
                     // Apply debuff to enemy
-                    System.out.println("Choose enemy to debuff:");
-                    for (int i = 0; i < engine.enemyCount; i++) {
-                        Enemy e = engine.enemies[i];
-                        System.out.println((i+1) + ". " + e.name);
-                    }
-                    int targetIdx = getIntInput(scanner, "Target: ", 1, engine.enemyCount) - 1;
+                    int targetIdx = getValidEnemyTarget(engine, scanner, "Choose enemy to debuff:");
+                    if (targetIdx == -1) return; // no alive enemies
                     Enemy target = engine.enemies[targetIdx];
                     StatusEffect effectCopy = effect.copy();
                     target.applyStatusEffect(effectCopy);
                 }
             }
+        }
+    }
+
+    private int getValidEnemyTarget(GameEngine engine, Scanner scanner, String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            int aliveCount = 0;
+            for (int i = 0; i < engine.enemyCount; i++) {
+                Enemy e = engine.enemies[i];
+                if (e.isAlive()) {
+                    aliveCount++;
+                    System.out.println("  " + (i+1) + ". " + e.name + " (HP: " + e.hp + "/" + e.maxHp + ")");
+                }
+            }
+            if (aliveCount == 0) {
+                System.out.println("No enemies alive!");
+                return -1;
+            }
+            int choice = getIntInput(scanner, "Target: ", 1, engine.enemyCount) - 1;
+            if (choice >= 0 && choice < engine.enemyCount && engine.enemies[choice].isAlive()) {
+                return choice;
+            }
+            System.out.println("That enemy is already dead. Choose a living target.");
         }
     }
 

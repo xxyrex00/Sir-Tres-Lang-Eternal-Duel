@@ -1,6 +1,4 @@
 import java.util.Scanner;
-// Xyrex Reminder: Add a check if player select an enemy that is already dead, 
-// and prompt them to select again. (Naa ni sa Player.takeTurn() method))
 
 public class GameEngine {
     // Core game data
@@ -87,21 +85,21 @@ public class GameEngine {
             case 1: // Warrior
                 p = new Player(name, "Warrior", 100, 50, 20, 10, 5);
                 p.setSkills(
-                    new DamageSkill("Whirlwind Slash", 10, true, 15, new BurnEffect(5, 2)),
+                    new DamageSkill("Whirlwind Slash", 10, 15, null),
                     new SupportSkill("Second Wind", 8, false, 20, new DefenseBuffEffect(10, 2))
                 );
                 break;
             case 2: // Mage
                 p = new Player(name, "Mage", 70, 80, 15, 5, 10);
                 p.setSkills(
-                    new DamageSkill("Firestorm", 15, true, 20, new BurnEffect(5, 2)),
+                    new DamageSkill("Firestorm", 15, 20, new BurnEffect(5, 2)),
                     new SupportSkill("Cure Wound", 10, true, 25, null)
                 );
                 break;
             case 3: // Archer
                 p = new Player(name, "Archer", 80, 60, 18, 7, 7);
                 p.setSkills(
-                    new DamageSkill("Poison Volley", 12, true, 18, new PoisonEffect(5, 2)),
+                    new DamageSkill("Poison Volley", 12, 18, new PoisonEffect(5, 2)),
                     new SupportSkill("Hunter's Mark", 8, false, 0, new DefenseDebuffEffect(15, 2))
                 );
                 break;
