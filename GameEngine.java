@@ -2,10 +2,10 @@ import java.util.Scanner;
 
 public class GameEngine {
     // Core game data
-    public Player[] heroes = new Player[3];       // Three player characters
-    public Enemy[] enemies = new Enemy[3];        // Max number of enemies per encounter
-    public int enemyCount;                         // Actual number of enemies in current encounter
-    private int encounterNumber = 0;                // Current encounter (1-8)
+    public Player[] heroes = new Player[3];           // Three player characters
+    public Enemy[] enemies = new Enemy[3];            // Max number of enemies per encounter
+    public int enemyCount;                            // Actual number of enemies in current encounter
+    private int encounterNumber = 0;                  // Current encounter (1-8)
     private Scanner scanner = new Scanner(System.in);
 
     // Equipment tiers per class (index 0 = basic, 1 = improved, 2 = best)
@@ -13,9 +13,9 @@ public class GameEngine {
     private Weapon[] mageWeapons    = { new Weapon("Wooden Staff", 4),    new Weapon("Enchanted Staff", 8),  new Weapon("Arcane Scepter", 12) };
     private Weapon[] archerWeapons  = { new Weapon("Short Bow", 4),       new Weapon("Longbow", 8),          new Weapon("Elven Bow", 12) };
 
-    private Armor[] warriorArmors   = { new Armor("Leather Armor", 2),    new Armor("Chain Mail", 5),        new Armor("Dragon Scale", 8) };
-    private Armor[] mageArmors      = { new Armor("Cloth Robe", 2),       new Armor("Enchanted Robe", 5),    new Armor("Arcane Vestment", 8) };
-    private Armor[] archerArmors    = { new Armor("Leather Vest", 2),     new Armor("Ranger Coat", 5),       new Armor("Shadow Cloak", 8) };
+    private Armor[] warriorArmors   = { new Armor("Leather Armor", 2),   new Armor("Chain Mail", 5),       new Armor("Dragon Scale", 8) };
+    private Armor[] mageArmors      = { new Armor("Cloth Robe", 2),      new Armor("Enchanted Robe", 5),   new Armor("Arcane Vestment", 8) };
+    private Armor[] archerArmors    = { new Armor("Leather Vest", 2),    new Armor("Ranger Coat", 5),      new Armor("Shadow Cloak", 8) };
 
     private Weapon[] getWeaponTiers(Player p) {
         switch (p.heroClass) {
@@ -54,11 +54,11 @@ public class GameEngine {
                 if (isArea2) {
                     System.out.println("        AREA 2 - ANCIENT CRYPT");
                     printSeparator();
-                    System.out.println("     The air reeks of death and decay...");
+                    System.out.println("   The air reeks of death and decay...");
                 } else {
                     System.out.println("        AREA 1 - GOBLIN CAMP");
                     printSeparator();
-                    System.out.println("      A foul stench fills the air...");
+                    System.out.println("     A foul stench fills the air...");
                 }
                 printSeparator();
                 System.out.println();
@@ -68,7 +68,7 @@ public class GameEngine {
                 String bossName = (encounterNumber == 4) ? "Goblin King" : "Lich King";
                 System.out.println("         ENCOUNTER " + encounterNumber + " - BOSS!");
                 printSeparator();
-                System.out.println("          *** " + bossName + " appears! ***");
+                System.out.println("     *** " + bossName + " appears! ***");
             } else {
                 System.out.println("             ENCOUNTER " + encounterNumber);
             }
@@ -197,8 +197,6 @@ public class GameEngine {
 
     // COMBAT LOOP
     private boolean runCombat() {
-        // No redundant enemy list here – it will be shown on each player's turn
-
         while (true) {
             // Players' turns (always first)
             for (int i = 0; i < 3; i++) {
@@ -208,7 +206,7 @@ public class GameEngine {
                         printVictorySummary();
                         return true;
                     }
-                    System.out.println(); // Make text readable between turns
+                    System.out.println();
                 }
             }
 
@@ -248,20 +246,20 @@ public class GameEngine {
     // POST-ENCOUNTER ACTIONS
     private void fullHealHeroes() {
         for (Player p : heroes) {
-            p.hp = Math.min(p.maxHp, p.hp + (int)(p.maxHp * 0.7)); // restore 70% of max HP
-            p.mp = Math.min(p.maxMp, p.mp + (int)(p.maxMp * 0.9)); // restore 90% of max MP
+            p.hp = Math.min(p.maxHp, p.hp + (int)(p.maxHp * 0.4)); // restore 40% of max HP
+            p.mp = Math.min(p.maxMp, p.mp + (int)(p.maxMp * 1)); // restore 100% of max MP
             p.removeAllStatusEffects(); // Clears any lingering debuffs (e.g., Intimidate)
         }
-        System.out.println("\n*** Heroes rest and recover (70% HP, 90% MP restored)! ***\n");
+        System.out.println("\n*** Heroes rest and recover (40% HP, 100% MP restored)! ***\n");
     }
 
     private void offerEquipmentUpgrade() {
         System.out.println();
         printSeparator();
-        System.out.println("          New Equipment Found!");
+        System.out.println("         New Equipment Found!");
         printSeparator();
         System.out.println();
-        int tierIndex = (encounterNumber == 3) ? 1 : 2; // encounter 3 → tier 1, encounter 7 → tier 2
+        int tierIndex = (encounterNumber == 3) ? 1 : 2; // encounter 3 -> tier 1, encounter 7 -> tier 2
 
         for (int i = 0; i < 3; i++) {
             Player p = heroes[i];
@@ -313,9 +311,9 @@ public class GameEngine {
         System.out.println();
         printSeparator();
         System.out.println("             *** VICTORY! ***");
-        System.out.println("          Enemies defeated: " + enemyCount);
+        System.out.println("           Enemies defeated: " + enemyCount);
         System.out.println("          Heroes remaining: " + heroesAlive + "/3");
-        if (encounterNumber < 8) System.out.println("    Proceeding to encounter " + (encounterNumber + 1) + "...");
+        if (encounterNumber < 8) System.out.println("       Proceeding to encounter " + (encounterNumber + 1) + "...");
         printSeparator();
         System.out.println();
     }
@@ -331,7 +329,7 @@ public class GameEngine {
             System.out.print("  Enter choice: ");
             if (scanner.hasNextInt()) {
                 val = scanner.nextInt();
-                scanner.nextLine(); // consume newline
+                scanner.nextLine();
                 if (val >= min && val <= max) {
                     return val;
                 } else {
