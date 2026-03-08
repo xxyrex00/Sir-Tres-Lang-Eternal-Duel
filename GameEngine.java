@@ -1,9 +1,11 @@
 import java.util.Scanner;
+// Xyrex Reminder: Add a check if player select an enemy that is already dead, 
+// and prompt them to select again. (Naa ni sa Player.takeTurn() method))
 
 public class GameEngine {
     // Core game data
     public Player[] heroes = new Player[2];       // Two player characters
-    public Enemy[] enemies = new Enemy[3];        // Up to three enemies per encounter
+    public Enemy[] enemies = new Enemy[3];        // Max number of enemies per encounter
     public int enemyCount;                         // Actual number of enemies in current encounter
     private int encounterNumber = 0;                // Current encounter (1-8)
     private Scanner scanner = new Scanner(System.in);
@@ -20,7 +22,7 @@ public class GameEngine {
         new Armor("Dragon Scale", 10)
     };
 
-    // ==================== MAIN GAME LOOP ====================
+    // MAIN GAME LOOP
     public void start() {
         System.out.println("=======================================");
         System.out.println("           ETERNAL DUEL                ");
@@ -61,7 +63,7 @@ public class GameEngine {
         }
     }
 
-    // ==================== INITIALIZATION ====================
+    // INITIALIZATION
     private void createCharacters() {
         System.out.println("---------- Character Creation ----------\n");
         System.out.println("Create Hero 1:");
@@ -118,7 +120,7 @@ public class GameEngine {
         System.out.println("\nAll heroes equipped with basic gear.\n");
     }
 
-    // ==================== ENEMY GENERATION ====================
+    // ENEMY GENERATION
     private void generateEnemies(boolean isBoss) {
         if (isBoss) {
             enemyCount = 1;
@@ -142,7 +144,7 @@ public class GameEngine {
         }
     }
 
-    // ==================== COMBAT LOOP ====================
+    // COMBAT LOOP
     private boolean runCombat() {
         // No redundant enemy list here – it will be shown on each player's turn
 
@@ -192,7 +194,7 @@ public class GameEngine {
         return true;
     }
 
-    // ==================== POST-ENCOUNTER ACTIONS ====================
+    // POST-ENCOUNTER ACTIONS
     private void fullHealHeroes() {
         for (Player p : heroes) {
             p.hp = p.maxHp;
@@ -243,7 +245,7 @@ public class GameEngine {
         System.out.println("=======================================\n");
     }
 
-    // ==================== INPUT CHECKER ====================
+    // INPUT CHECKER
     private int getIntInput(int min, int max) {
         int val;
         while (true) {
