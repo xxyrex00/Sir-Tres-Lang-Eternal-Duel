@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 public class Player extends Character {
     public String heroClass; // accessible to Enemy for targeting
-    private Skill[] skills = new Skill[2];//asdasdasdasdasd
+    private Skill[] skills = new Skill[2];
     private int mpRegen;
 
     public Player(String name, String heroClass, int maxHp, int maxMp, int attack, int defense, int mpRegen) {
@@ -25,6 +25,9 @@ public class Player extends Character {
 
     @Override
     public void takeTurn(GameEngine engine, Scanner scanner) {
+        processStartOfTurnEffects(); // Bug 4 fix: was missing entirely
+        if (!isAlive()) return;      // Safety check in case a start-of-turn effect kills the player
+
         // Display enemy status at the start of the turn
         System.out.println("--- Current Enemies ---");
         for (int i = 0; i < engine.enemyCount; i++) {
@@ -43,14 +46,9 @@ public class Player extends Character {
         if (choice == 1) {
             // Attack
             if (engine.enemyCount == 0) return;
-            System.out.println("  Choose target:");
-            for (int i = 0; i < engine.enemyCount; i++) {
-                Enemy e = engine.enemies[i];
-                if (e.isAlive()) {
-                    System.out.println("    " + (i+1) + ". " + e.name + " (HP: " + e.hp + "/" + e.maxHp + ")");
-                }
-            }
-            int targetIdx = getIntInput(scanner, "  Target: ", 1, engine.enemyCount) - 1;
+            // Bug 1 fix: replaced manual target selection with getValidEnemyTarget()
+            int targetIdx = getValidEnemyTarget(engine, scanner, "Choose target:");
+            if (targetIdx == -1) return; // no alive enemies
             Enemy target = engine.enemies[targetIdx];
             int damage = getTotalAttack() - target.getTotalDefense();
             if (damage < 1) damage = 1;
@@ -75,6 +73,29 @@ public class Player extends Character {
         System.out.println(); // blank line before regen
         regenerateMp();
         processEndOfTurnEffects();
+    }
+
+    private int getValidEnemyTarget(GameEngine engine, Scanner scanner, String prompt) {
+        while (true) {
+            System.out.println("  " + prompt);
+            int aliveCount = 0;
+            for (int i = 0; i < engine.enemyCount; i++) {
+                Enemy e = engine.enemies[i];
+                if (e.isAlive()) {
+                    aliveCount++;
+                    System.out.println("    " + (i+1) + ". " + e.name + " (HP: " + e.hp + "/" + e.maxHp + ")");
+                }
+            }
+            if (aliveCount == 0) {
+                System.out.println("  No enemies alive!");
+                return -1;
+            }
+            int choice = getIntInput(scanner, "  Target: ", 1, engine.enemyCount) - 1;
+            if (choice >= 0 && choice < engine.enemyCount && engine.enemies[choice].isAlive()) {
+                return choice;
+            }
+            System.out.println("  That enemy is already dead. Choose a living target.");
+        }
     }
 
     private int getIntInput(Scanner sc, String prompt, int min, int max) {
