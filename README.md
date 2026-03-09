@@ -2,7 +2,7 @@
 
 **Group Name:** Sir Tres Lang
 
-A turn-based RPG where players control heroes, use skills and items, and fight enemies and bosses to gain experience and level up. The game demonstrates interconnected OOP concepts through characters, skills, items, and combat management.
+A turn-based RPG where players control heroes, use skills, and fight enemies and bosses to gain new equipment and progress. The game demonstrates interconnected OOP concepts through characters, skills, items, and combat management.
 
 ## Members and Contributions
 
@@ -15,11 +15,11 @@ A turn-based RPG where players control heroes, use skills and items, and fight e
 
 ## Game Overview
 
-- Create two heroes by choosing a class (Warrior, Mage, Archer) and giving them names.
+- Create three heroes (Warrior, Mage, Archer) and give them names.
 - Battle through up to 8 encounters, with a boss every 4th encounter.
 - Each hero has unique skills that can deal damage, heal, or apply status effects.
-- Enemies target heroes based on priority: Warrior > Mage > Archer.
-- After every 3rd encounter, heroes can upgrade their weapons and armor.
+- Enemies target heroes based on priority: Warrior > Archer > Mage.
+- Before every Boss encounter, heroes can upgrade their weapons and armor.
 - Status effects (Poison, Burn, Defense buffs/debuffs) have durations and can stack duration if reapplied.
 
 ## Key OOP Concepts Demonstrated
@@ -29,3 +29,10 @@ A turn-based RPG where players control heroes, use skills and items, and fight e
 - **Polymorphism** – Overridden `takeTurn()` methods; `use()` method in skills; status effects with different behaviors
 - **Encapsulation** – Private fields with controlled access through methods
 - **Composition** – Characters hold references to `Weapon`, `Armor`, `StatusEffect`, and `Skill` objects
+
+## Changes to Original Layout Report
+## Before: 
+ Jose Alejandro C. Mata classes: `Hero`, `Warrior`, `Mage`, `Archer`
+
+##  After:
+  Jose Alejandro C. Mata classes: `BurnEffect`, `DefenseBuffEffect`, `DefenseDebuffEffect`, `PoisonEffect`
