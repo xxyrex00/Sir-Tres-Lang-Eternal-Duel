@@ -25,18 +25,20 @@ public class Player extends Character {
 
     @Override
     public void takeTurn(GameEngine engine, Scanner scanner) {
-        processStartOfTurnEffects(); // Bug 4 fix: was missing entirely
-        if (!isAlive()) return;      // Safety check in case a start-of-turn effect kills the player
+        processStartOfTurnEffects();
+        if (!isAlive()) return;
 
-        // UI #6: Clearer turn banner
         System.out.println("=======================================");
         System.out.println("        " + name.toUpperCase() + "'S TURN (" + heroClass + ")");
         System.out.println("=======================================");
 
-        // UI #1+2: Show both heroes and enemies with status effects
         System.out.println("  --- HEROES ---");
         for (Player p : engine.heroes) {
-            String status = p.statusEffect != null ? " [" + p.statusEffect + "]" : "";
+            StringBuilder status = new StringBuilder();
+            for (int i = 0; i < p.effectCount; i++) {
+                status.append(i == 0 ? " [" : ", ").append(p.statusEffects[i]);
+            }
+            if (p.effectCount > 0) status.append("]");
             System.out.printf("    %-12s HP: %d/%d | MP: %d/%d%s%n",
                 p.name + " (" + p.heroClass + ")", p.hp, p.maxHp, p.mp, p.maxMp, status);
         }
@@ -44,7 +46,11 @@ public class Player extends Character {
         for (int i = 0; i < engine.enemyCount; i++) {
             Enemy e = engine.enemies[i];
             if (e.isAlive()) {
-                String status = e.statusEffect != null ? " [" + e.statusEffect + "]" : "";
+                StringBuilder status = new StringBuilder();
+                for (int j = 0; j < e.effectCount; j++) {
+                    status.append(j == 0 ? " [" : ", ").append(e.statusEffects[j]);
+                }
+                if (e.effectCount > 0) status.append("]");
                 System.out.printf("    %d. %-10s HP: %d/%d%s%n", i+1, e.name, e.hp, e.maxHp, status);
             }
         }
@@ -57,14 +63,12 @@ public class Player extends Character {
         if (choice == 1) {
             // Attack
             if (engine.enemyCount == 0) return;
-            // Bug 1 fix: replaced manual target selection with getValidEnemyTarget()
             int targetIdx = getValidEnemyTarget(engine, scanner, "Choose target:");
-            if (targetIdx == -1) return; // no alive enemies
+            if (targetIdx == -1) return;
             Enemy target = engine.enemies[targetIdx];
             int damage = Math.max(1, getTotalAttack() - target.getTotalDefense());
             System.out.println("  " + name + " attacks " + target.name + " for " + damage + " damage!");
             target.takeDamage(damage);
-            // UI #5: Combat result summary
             if (!target.isAlive()) {
                 System.out.println("  >> *** " + target.name + " defeated! ***");
             } else {
@@ -78,7 +82,6 @@ public class Player extends Character {
             }
             int skillIdx = getIntInput(scanner, "  Skill: ", 1, 2) - 1;
             Skill skill = skills[skillIdx];
-            // UI #4: Better MP feedback
             if (!useMp(skill.getMpCost())) {
                 System.out.println("  Not enough MP! (Need " + skill.getMpCost() + " MP, have " + mp + " MP)");
                 return;
@@ -94,7 +97,7 @@ public class Player extends Character {
         }
         if (allDefeated) return;
 
-        System.out.println(); // blank line before regen
+        System.out.println();
         regenerateMp();
         processEndOfTurnEffects();
     }

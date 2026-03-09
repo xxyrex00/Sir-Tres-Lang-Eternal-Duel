@@ -5,7 +5,8 @@ public abstract class Character {
     protected int hp, maxHp;
     protected int mp, maxMp;
     protected int attack, defense;
-    protected StatusEffect statusEffect;
+    protected StatusEffect[] statusEffects = new StatusEffect[4];
+    protected int effectCount = 0;
     protected Weapon weapon;
     protected Armor armor;
 
@@ -17,7 +18,6 @@ public abstract class Character {
         this.mp = maxMp;
         this.attack = attack;
         this.defense = defense;
-        this.statusEffect = null;
     }
 
     public boolean isAlive() { return hp > 0; }
@@ -62,42 +62,56 @@ public abstract class Character {
     }
 
     public void applyStatusEffect(StatusEffect newEffect) {
-        if (statusEffect != null) {
-            // Same class → stack duration
-            if (statusEffect.getClass().equals(newEffect.getClass())) {
-                statusEffect.duration += newEffect.duration;
-                System.out.println(name + "'s " + statusEffect.name + " duration extended to " + statusEffect.duration + " turns.");
+        // Same class already exists → stack duration
+        for (int i = 0; i < effectCount; i++) {
+            if (statusEffects[i].getClass().equals(newEffect.getClass())) {
+                statusEffects[i].duration += newEffect.duration;
+                System.out.println(name + "'s " + statusEffects[i].name + " duration extended to " + statusEffects[i].duration + " turns.");
                 return;
             }
-            System.out.println(name + " already has a different effect (" + statusEffect + ") – cannot apply " + newEffect + ".");
+        }
+        // Array full — cannot add more effects
+        if (effectCount >= statusEffects.length) {
+            System.out.println(name + " is already affected by too many effects!");
             return;
         }
-        // No existing effect
-        statusEffect = newEffect;
+        // New effect — add to array
+        statusEffects[effectCount] = newEffect;
+        effectCount++;
         newEffect.setOwner(this);
         System.out.println(name + " is now affected by " + newEffect);
     }
 
-    public void removeStatusEffect() {
-        if (statusEffect != null) {
-            System.out.println(name + " is no longer affected by " + statusEffect);
-            statusEffect.onRemove(this);
-            statusEffect = null;
+    public void removeStatusEffect(int index) {
+        StatusEffect effect = statusEffects[index];
+        System.out.println(name + " is no longer affected by " + effect);
+        effect.onRemove(this);
+        // Shift remaining effects down
+        for (int i = index; i < effectCount - 1; i++) {
+            statusEffects[i] = statusEffects[i + 1];
+        }
+        statusEffects[effectCount - 1] = null;
+        effectCount--;
+    }
+
+    public void removeAllStatusEffects() {
+        while (effectCount > 0) {
+            removeStatusEffect(0);
         }
     }
 
     public void processStartOfTurnEffects() {
-        if (statusEffect != null) {
-            statusEffect.applyStartOfTurn(this);
+        for (int i = 0; i < effectCount; i++) {
+            statusEffects[i].applyStartOfTurn(this);
         }
     }
 
     public void processEndOfTurnEffects() {
-        if (statusEffect != null) {
-            statusEffect.applyEndOfTurn(this);
-            statusEffect.reduceDuration();
-            if (statusEffect.isExpired()) {
-                removeStatusEffect();
+        for (int i = effectCount - 1; i >= 0; i--) {
+            statusEffects[i].applyEndOfTurn(this);
+            statusEffects[i].reduceDuration();
+            if (statusEffects[i].isExpired()) {
+                removeStatusEffect(i);
             }
         }
     }
