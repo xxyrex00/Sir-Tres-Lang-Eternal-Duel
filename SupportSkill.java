@@ -22,13 +22,13 @@ public class SupportSkill extends Skill {
             if (onAlly) {
                 // Heal an ally (including self if chosen)
                 System.out.println("Choose target to heal:");
-                for (int i = 0; i < 2; i++) {
+                for (int i = 0; i < 3; i++) {
                     Player p = engine.heroes[i];
                     if (p.isAlive()) {
                         System.out.printf("  %d. %s (HP: %d/%d)%n", i+1, p.name, p.hp, p.maxHp);
                     }
                 }
-                int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
+                int targetIdx = getIntInput(scanner, "Target: ", 1, 3) - 1;
                 Player target = engine.heroes[targetIdx];
                 target.heal(healAmount);
                 // If there's an effect, apply it to the same target
@@ -49,17 +49,17 @@ public class SupportSkill extends Skill {
                 if (onAlly) {
                     // Apply buff to ally
                     System.out.println("Choose ally to buff:");
-                    for (int i = 0; i < 2; i++) {
+                    for (int i = 0; i < 3; i++) {
                         Player p = engine.heroes[i];
                         System.out.println((i+1) + ". " + p.name);
                     }
-                    int targetIdx = getIntInput(scanner, "Target: ", 1, 2) - 1;
+                    int targetIdx = getIntInput(scanner, "Target: ", 1, 3) - 1;
                     Player target = engine.heroes[targetIdx];
                     target.applyStatusEffect(effect.copy());
                 } else {
                     // Apply debuff to enemy
                     int targetIdx = getValidEnemyTarget(engine, scanner, "Choose enemy to debuff:");
-                    if (targetIdx == -1) return; // no alive enemies
+                    if (targetIdx == -1) return;
                     Enemy target = engine.enemies[targetIdx];
                     target.applyStatusEffect(effect.copy());
                 }
