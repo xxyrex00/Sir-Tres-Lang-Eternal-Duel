@@ -126,24 +126,24 @@ public class GameEngine {
         Player p;
         switch (heroClass) {
             case "Warrior":
-                p = new Player(name, "Warrior", 120, 40, 18, 12, 3);
+                p = new Player(name, "Warrior", 85, 30, 13, 7, 2);
                 p.setSkills(
-                    new DamageSkill("Shield Bash", 12, 12, new DefenseDebuffEffect(10, 2), true),
-                    new SupportSkill("Second Wind", 10, false, 15, new DefenseBuffEffect(8, 3))
+                    new DamageSkill("Shield Bash", 12, 8, new DefenseDebuffEffect(10, 2), true),
+                    new SupportSkill("Second Wind", 10, false, 10, new DefenseBuffEffect(8, 3))
                 );
                 break;
             case "Mage":
-                p = new Player(name, "Mage", 85, 100, 12, 4, 12);
+                p = new Player(name, "Mage", 60, 75, 9, 2, 8);
                 p.setSkills(
-                    new DamageSkill("Firestorm", 18, 22, new BurnEffect(8, 3)),
+                    new DamageSkill("Firestorm", 18, 14, new BurnEffect(8, 3)),
                     new SupportSkill("Frost Armor", 12, true, 0, new DefenseBuffEffect(8, 3))
                 );
                 break;
             case "Archer":
-                p = new Player(name, "Archer", 90, 70, 15, 7, 7);
+                p = new Player(name, "Archer", 70, 55, 11, 4, 5);
                 p.setSkills(
-                    new DamageSkill("Poison Volley", 14, 16, new PoisonEffect(6, 3)),
-                    new DamageSkill("Aimed Shot", 16, 30, null, true)
+                    new DamageSkill("Poison Volley", 14, 10, new PoisonEffect(6, 3)),
+                    new DamageSkill("Aimed Shot", 16, 19, null, true)
                 );
                 break;
             default:
@@ -247,10 +247,10 @@ public class GameEngine {
     private void fullHealHeroes() {
         for (Player p : heroes) {
             p.hp = Math.min(p.maxHp, p.hp + (int)(p.maxHp * 0.4)); // restore 40% of max HP
-            p.mp = Math.min(p.maxMp, p.mp + (int)(p.maxMp * 1)); // restore 100% of max MP
+            p.mp = Math.min(p.maxMp, p.mp + (int)(p.maxMp * 0.4)); // restore 40% of max MP
             p.removeAllStatusEffects(); // Clears any lingering debuffs (e.g., Intimidate)
         }
-        System.out.println("\n*** Heroes rest and recover (40% HP, 100% MP restored)! ***\n");
+        System.out.println("\n*** Heroes rest and recover (40% HP, 40% MP restored)! ***\n");
     }
 
     private void offerEquipmentUpgrade() {
