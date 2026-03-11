@@ -14,7 +14,6 @@ public class BurnEffect extends StatusEffect {
         int dmg = magnitude;
         System.out.println(c.name + " is burned, losing " + dmg + " HP.");
         c.takeDamage(dmg);
-        magnitude += 5;
     }
 
     @Override
