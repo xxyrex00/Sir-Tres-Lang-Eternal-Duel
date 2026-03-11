@@ -10,11 +10,10 @@ public class PoisonEffect extends StatusEffect {
     public void applyStartOfTurn(Character c) { }
 
     @Override
-    public void applyEndOfTurn(Character c) {
+    public void applyEndOfTurn(Character c) {   // Applies poison damage at end of turn
         int dmg = magnitude;
         System.out.println(c.name + " suffers from poison, losing " + dmg + " HP.");
         c.takeDamage(dmg);
-        magnitude += 5; // increase each turn
     }
 
     @Override
